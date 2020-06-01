@@ -60,7 +60,7 @@ get_download_url() {
   local version="$1"
   local arch="$(get_arch)"
   local platform="$(get_platform)"
-  echo "https://github.com/zyedidia/micro/releases/download/v${version}/micro-${version}-${platform}${arch}.tar.gz"
+  echo "https://github.com/zyedidia/micro/releases/download/${version}/micro-${version}-${platform}${arch}.tar.gz"
 }
 
 install_micro $ASDF_INSTALL_TYPE $ASDF_INSTALL_VERSION $ASDF_INSTALL_PATH

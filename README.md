@@ -11,6 +11,8 @@ asdf plugin add micro
 asdf install micro 2.0.4
 ```
 
+Currently this plugin will only get the linux 64bit binary
+
 ## Acknowledgements
 Parts of this code come from the following repos:
 * https://github.com/johnhamelink/asdf-tekton-cli
