@@ -7,8 +7,8 @@ After installing [asdf](https://github.com/asdf-vm/asdf),
 you can add this plugin like this:
 
 ```bash
-asdf plugin add micro
-asdf install micro 2.0.4
+asdf plugin add micro https://github.com/YR-ZR0/asdf-micro
+asdf install micro 2.0.11
 ```
 
 Currently this plugin will only get the linux 64bit binary
