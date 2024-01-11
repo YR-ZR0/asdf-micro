@@ -81,6 +81,7 @@ case "$(uname -s | tr '[:upper:]' '[:lower:]')" in
 	esac
 	;;
 esac
+echo $platform
 }
 
 download_release() {
