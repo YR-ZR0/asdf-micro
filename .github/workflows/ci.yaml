@@ -1,0 +1,22 @@
+name: CI
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+      - main
+  pull_request:
+    branches:
+      - master
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: asdf_plugin_test
+        uses: asdf-vm/actions/plugin-test@v3.0.2
+        with:
+          command: "micro -version"

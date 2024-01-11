@@ -8,12 +8,11 @@ you can add this plugin like this:
 
 ```bash
 asdf plugin add micro https://github.com/YR-ZR0/asdf-micro
-asdf install micro 2.0.11
+asdf install micro 2.0.13
 ```
 
 Currently this plugin will only get the linux 64bit binary
 
 ## Acknowledgements
 Parts of this code come from the following repos:
-* https://github.com/johnhamelink/asdf-tekton-cli
-* https://gitlab.com/wt0f/asdf-bat
+- https://github.com/zyedidia/micro
