@@ -11,7 +11,9 @@ asdf plugin add micro https://github.com/YR-ZR0/asdf-micro
 asdf install micro 2.0.13
 ```
 
-Currently this plugin will only get the linux 64bit binary
+## Features
+
+- Automated version updates: The recommended version in this README is automatically updated when a new release of Micro is available.
 
 ## Acknowledgements
 Parts of this code come from the following repos:
