@@ -30,69 +30,85 @@ list_github_tags() {
 }
 
 list_all_versions() {
-	# TODO: Adapt this. By default we simply list the tag names from GitHub releases.
 	# Change this function if <YOUR TOOL> has other means of determining installable versions.
 	list_github_tags
 }
 
-get_arch() {
-  local arch=$(uname -m | tr '[:upper:]' '[:lower:]')
-  case $arch in
-    aarch64)
-      arch='arm64'
-      ;;
-    x86_64)
-      arch='64'
-      ;;
+get_os() {
+  case "$(uname -s | tr '[:upper:]' '[:lower:]')" in
+    "linux") echo "linux" ;;
+    "darwin") echo "darwin" ;;
+    *"freebsd"*) echo "freebsd" ;;
+    "openbsd") echo "openbsd" ;;
+    "netbsd") echo "netbsd" ;;
+    *) echo "unknown" ;;
   esac
-  echo "$arch"
 }
 
-# Detection nbased on the official install script
+get_arch() {
+  local machine=$(uname -m | tr '[:upper:]' '[:lower:]')
+  case "$machine" in
+    "arm64"* | "aarch64"* ) echo "arm64" ;;
+    "arm"* | "aarch"*) echo "arm" ;;
+    *"86") echo "32" ;;
+    *"64") echo "64" ;;
+    *) echo "unknown" ;;
+  esac
+}
+
+# Detection based on the official install script
 get_platform() {
-platform=''
-machine=$(uname -m)
-case "$(uname -s | tr '[:upper:]' '[:lower:]')" in
-"linux")
-	case "$machine" in
-	"arm64"* | "aarch64"* ) platform='linux-arm64' ;;
-	"arm"* | "aarch"*) platform='linux-arm' ;;
-	*"86") platform='linux32' ;;
-	*"64") platform='linux64' ;;
-	esac
-	;;
-"darwin") platform='osx' ;;
-*"freebsd"*)
-	case "$machine" in
-	*"86") platform='freebsd32' ;;
-	*"64") platform='freebsd64' ;;
-	esac
-	;;
-"openbsd")
-	case "$machine" in
-	*"86") platform='openbsd32' ;;
-	*"64") platform='openbsd64' ;;
-	esac
-	;;
-"netbsd")
-	case "$machine" in
-	*"86") platform='netbsd32' ;;
-	*"64") platform='netbsd64' ;;
-	esac
-	;;
-esac
-echo $platform
+  local os=$(get_os)
+  local arch=$(get_arch)
+  local platform=""
+
+  case "$os" in
+    "linux")
+      case "$arch" in
+        "arm64") platform="linux-arm64" ;;
+        "arm") platform="linux-arm" ;;
+        "32") platform="linux32" ;;
+        "64") platform="linux64" ;;
+      esac
+      ;;
+    "darwin")
+      case "$arch" in
+        "arm64") platform="osx-arm64" ;;
+        *) platform="osx" ;;
+      esac
+      ;;
+    "freebsd")
+      case "$arch" in
+        "32") platform="freebsd32" ;;
+        "64") platform="freebsd64" ;;
+      esac
+      ;;
+    "openbsd")
+      case "$arch" in
+        "32") platform="openbsd32" ;;
+        "64") platform="openbsd64" ;;
+      esac
+      ;;
+    "netbsd")
+      case "$arch" in
+        "32") platform="netbsd32" ;;
+        "64") platform="netbsd64" ;;
+      esac
+      ;;
+  esac
+
+  echo "$platform"
 }
 
 download_release() {
 	local version filename url
 	version="$1"
 	filename="$2"
-	os=$(get_platform)
+	platform=$(get_platform)
 
-	url="$GH_REPO/releases/download/v${version}/$TOOL_NAME-${version}-${os}.tar.gz"
+	url="$GH_REPO/releases/download/v${version}/$TOOL_NAME-${version}-${platform}.tar.gz"
 
-	echo "* Downloading $TOOL_NAME release $version..."
+	echo "* Downloading $TOOL_NAME release $version for platform ${platform}..."
 	curl "${curl_opts[@]}" -o "$filename" -C - "$url" || fail "Could not download $url"
 }
 
@@ -107,8 +123,8 @@ install_version() {
 
 	(
 		mkdir -p "$install_path"
-		cp -r "$ASDF_DOWNLOAD_PATH"/* "$install_path"
-
+    cp -r "$ASDF_DOWNLOAD_PATH/micro" "$install_path"
+    chmod +x "$install_path/$TOOL_NAME"
 		local tool_cmd
 		tool_cmd="$(echo "$TOOL_TEST" | cut -d' ' -f1)"
 		test -x "$install_path/$tool_cmd" || fail "Expected $install_path/$tool_cmd to be executable."

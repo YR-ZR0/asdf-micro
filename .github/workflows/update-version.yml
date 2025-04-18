@@ -1,0 +1,50 @@
+name: Update Micro Version
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * 0'  # Run weekly on Sunday at midnight
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/update-version.yml'
+
+jobs:
+  update-version:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Fetch latest Micro release
+        id: fetch-version
+        run: |
+          LATEST_VERSION=$(curl -s https://api.github.com/repos/zyedidia/micro/releases/latest | jq -r '.tag_name')
+          echo "latest_version=${LATEST_VERSION}" >> $GITHUB_OUTPUT
+          CURRENT_VERSION=$(grep -oP 'asdf install micro \K[0-9.]+' README.md || echo "none")
+          echo "current_version=${CURRENT_VERSION}" >> $GITHUB_OUTPUT
+
+      - name: Update README if version changed
+        if: steps.fetch-version.outputs.current_version != steps.fetch-version.outputs.latest_version
+        run: |
+          LATEST_VERSION="${{ steps.fetch-version.outputs.latest_version }}"
+          sed -i "s/asdf install micro [0-9.]\+/asdf install micro ${LATEST_VERSION}/" README.md
+
+      - name: Create Pull Request
+        if: steps.fetch-version.outputs.current_version != steps.fetch-version.outputs.latest_version
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "Update Micro version to ${{ steps.fetch-version.outputs.latest_version }}"
+          title: "Update Micro version to ${{ steps.fetch-version.outputs.latest_version }}"
+          body: |
+            This PR updates the recommended Micro version in the README.md to the latest release (${{ steps.fetch-version.outputs.latest_version }}).
+
+            Automated changes by GitHub Action.
+          branch: update-micro-version
+          base: main
+          delete-branch: true
