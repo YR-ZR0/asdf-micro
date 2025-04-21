@@ -23,7 +23,7 @@ jobs:
       - name: Fetch latest Micro release
         id: fetch-version
         run: |
-          LATEST_VERSION=$(curl -s https://api.github.com/repos/zyedidia/micro/releases/latest | jq -r '.tag_name')
+          LATEST_VERSION=$(curl -s https://api.github.com/repos/zyedidia/micro/releases/latest | jq -r '.tag_name' | sed 's/^v//')
           echo "latest_version=${LATEST_VERSION}" >> $GITHUB_OUTPUT
           CURRENT_VERSION=$(grep -oP 'asdf install micro \K[0-9.]+' README.md || echo "none")
           echo "current_version=${CURRENT_VERSION}" >> $GITHUB_OUTPUT
