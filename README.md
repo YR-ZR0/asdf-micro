@@ -8,7 +8,7 @@ you can add this plugin like this:
 
 ```bash
 asdf plugin add micro https://github.com/YR-ZR0/asdf-micro
-asdf install micro 2.0.14
+asdf install micro v2.0.14
 ```
 
 ## Features
